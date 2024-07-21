@@ -1,8 +1,9 @@
 function getPosts(reload = true, page = 1) {
     axios
-        .get(url + `/posts?limit=5&page=${page}`)
+        .get(baseUrl + `/posts?limit=5&page=${page}`)
         .then((response) => {
-            document.getElementById("posts").innerHTML = "";
+            if (reload) document.getElementById("posts").innerHTML = "";
+
             lastPage = response.data.meta.last_page;
             console.log(response.data);
             let userImage = `images/userNone.jpg`;
@@ -11,7 +12,19 @@ function getPosts(reload = true, page = 1) {
             let body = "";
             let userName = "";
             let tags = [];
+
             for (let data of response.data.data) {
+                // show or hide (Edit) Button
+                let user = getCurrentUser();
+                let isMyPost = user != null && data.author.id == user.id;
+                let buttonEditContent = ``;
+                if (isMyPost) {
+                    buttonEditContent = `<button class="btn btn-secondary mt-2" onclick="editPostClicked('${encodeURIComponent(
+                        JSON.stringify(data)
+                    )}')"
+                        style="float: right; padding: 8px 20px;">EDIT</button>`;
+                }
+
                 if (JSON.stringify(data.image) != "{}") bodyImage = data.image;
                 if (data.title != null) title = data.title;
                 if (data.body != null) body = data.body;
@@ -29,7 +42,8 @@ function getPosts(reload = true, page = 1) {
                     title,
                     body,
                     userName,
-                    tags
+                    tags,
+                    buttonEditContent
                 );
             }
             SetUpUI();
@@ -41,13 +55,21 @@ function getPosts(reload = true, page = 1) {
 function getPostClicked(postID) {
     window.location = `post.html?postid=${postID}`;
 }
-function FillPosts(data, userImage, bodyImage, title, body, username, tags) {
+function FillPosts(
+    data,
+    userImage,
+    bodyImage,
+    title,
+    body,
+    username,
+    tags,
+    buttonEditContent
+) {
     let content = ` <div id="post" class="card col-9 shadow" ">
                 <div class="card-header">
                     <img src="${userImage}" alt="user-image" id="user-image" class="rounded-circle m-2 user-image">
                     <p class="d-inline"><b>${username}</b></p>
-                    <button class="btn btn-secondary mt-2" onclick="editPostClicked(${data.id})"
-                        style="float: right; padding: 8px 20px;">EDIT</button>
+                    ${buttonEditContent}
                 </div>
                 <div class="card-body d-flex justify-content-center flex-column" style="cursor:pointer" onclick="getPostClicked(${data.id})">
                     <img src="${bodyImage}" alt="" id="body-image" class="w-100">
@@ -83,9 +105,12 @@ function FillPosts(data, userImage, bodyImage, title, body, username, tags) {
 }
 getPosts(1);
 function CreateNewPostBtnClicked() {
+    let url = ``;
+    const postID = document.getElementById("post-id-input").value;
     const postTitle = document.getElementById("post-title").value;
     const postBody = document.getElementById("post-body").value;
     const postImage = document.getElementById("post-image").files[0];
+    let isCreate = postID == null || postID == "";
 
     let formData = new FormData();
     formData.append("body", postBody);
@@ -97,8 +122,14 @@ function CreateNewPostBtnClicked() {
         authorization: `Bearer ${localStorage.getItem("token")}`,
     };
 
+    if (isCreate) {
+        url = `${baseUrl}/posts`;
+    } else {
+        formData.append("_method", "put");
+        url = `${baseUrl}/posts/${postID}`;
+    }
     axios
-        .post(url + "/posts", formData, {
+        .post(url, formData, {
             headers: headers,
         })
         .then((response) => {
@@ -114,15 +145,40 @@ function CreateNewPostBtnClicked() {
             getPosts();
         })
         .catch((error) => {
-            ShowAlert(error.response.data.message, "danger", "danger-alert");
+            ShowAlert(error.message, "danger", "danger-alert");
         });
 }
-function editPostClicked(postID) {
+function editPostClicked(data) {
+    let post = JSON.parse(decodeURIComponent(data));
+    console.log(post);
+    document.getElementById("create-modal-submit-btn").innerHTML = "UPDATE";
     document.getElementById("post-modal-title").innerHTML = "Edit Post";
+    document.getElementById("post-id-input").value = post.id;
+    document.getElementById("post-title").value = post.title;
+    document.getElementById("post-body").value = post.body;
     let postModal = new bootstrap.Modal(
         document.getElementById("create-post-modal"),
         {}
     );
     postModal.toggle();
-    console.log(postID);
+}
+
+function addNewPostBtnClicked() {
+    document.getElementById("create-modal-submit-btn").innerHTML = "CREATE";
+    document.getElementById("post-modal-title").innerHTML = "Create A New Post";
+    document.getElementById("post-id-input").value = "";
+    document.getElementById("post-title").value = "";
+    document.getElementById("post-body").value = "";
+    let postModal = new bootstrap.Modal(
+        document.getElementById("create-post-modal"),
+        {}
+    );
+    postModal.toggle();
+}
+
+function getCurrentUser() {
+    let user = null;
+    const storedUser = localStorage.getItem("user");
+    if (storedUser != null) user = JSON.parse(storedUser);
+    return user;
 }

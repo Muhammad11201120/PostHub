@@ -9,7 +9,7 @@ let lastPage = 0;
     }
 }); */
 SetUpUI();
-const url = "https://tarmeezacademy.com/api/v1";
+const baseUrl = "https://tarmeezacademy.com/api/v1";
 
 function LoginButtonClicked() {
     const username = document.getElementById("username").value;
@@ -19,7 +19,7 @@ function LoginButtonClicked() {
         password: password,
     };
     axios
-        .post(url + "/login", params)
+        .post(baseUrl + "/login", params)
         .then((response) => {
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("user", JSON.stringify(response.data.user));
@@ -35,7 +35,7 @@ function LoginButtonClicked() {
             SetUpUI();
         })
         .catch((error) => {
-            ShowAlert(error.response.data.message, "danger", "danger-alert");
+            ShowAlert(error.message, "danger", "danger-alert");
         });
 }
 function RegisterBtnClicked() {
@@ -71,7 +71,7 @@ function RegisterBtnClicked() {
             SetUpUI();
         })
         .catch((error) => {
-            ShowAlert(error.response.data.message, "danger", "danger-alert");
+            ShowAlert(error.message, "danger", "danger-alert");
         });
 }
 function Logout() {
@@ -133,39 +133,4 @@ function loadUserImage() {
         userImage.style.display = "flex";
         console.log(user_image);
     }
-}
-function CreateNewPostBtnClicked() {
-    const postTitle = document.getElementById("post-title").value;
-    const postBody = document.getElementById("post-body").value;
-    const postImage = document.getElementById("post-image").files[0];
-
-    let formData = new FormData();
-    formData.append("body", postBody);
-    formData.append("title", postTitle);
-    formData.append("image", postImage);
-
-    let headers = {
-        "Content-Type": "multipart/form-data",
-        authorization: `Bearer ${localStorage.getItem("token")}`,
-    };
-
-    axios
-        .post(url + "/posts", formData, {
-            headers: headers,
-        })
-        .then((response) => {
-            // closing modal
-            const modal = document.getElementById("create-post-modal");
-            const modalInstance = bootstrap.Modal.getInstance(modal);
-            modalInstance.hide();
-            ShowAlert(
-                "New Post Has Been Created Successfully",
-                "success",
-                "success-alert"
-            );
-            getPosts();
-        })
-        .catch((error) => {
-            ShowAlert(error.response.data.message, "danger", "danger-alert");
-        });
 }
