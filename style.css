@@ -1,9 +1,15 @@
 body {
-    background-color: #cacaca;
+    background: linear-gradient(135deg, #090918 0%, #5f758b 100%);
+    background-attachment: fixed;
 }
 .user-image {
     width: 40px;
     height: 40px;
+    border: 2px solid rgb(216, 213, 213);
+}
+.user-profile-image {
+    width: 100px;
+    height: 100px;
     border: 2px solid rgb(216, 213, 213);
 }
 #user-profile-image {
@@ -15,10 +21,23 @@ body {
     flex-direction: column;
     align-items: center;
 }
-/* #body-image {
+#post {
+    width: 75%;
+}
+#body-image {
     width: 100%;
-    height: 400px;
-} */
+    height: 600px;
+    border-radius: 4px;
+}
+@media only screen and (max-width: 768px) {
+    /* For mobile phones: */
+    #post {
+        width: 100%;
+    }
+    #body-image {
+        height: 350px;
+    }
+}
 .card {
     margin-bottom: 50px;
 }
@@ -47,10 +66,23 @@ h6 {
     color: rgb(7, 26, 32);
 }
 #single-post-title {
-    border: 1px solid rgb(59, 53, 53);
+    border: 1px solid #5f758b;
     padding: 10px 20px;
     border-radius: 4px;
     font-size: 30px;
-    background-color: rgb(59, 53, 53);
+    background-color: #090918;
     color: rgb(192, 191, 191);
+}
+.main-profile-text {
+    font-size: 20px;
+    font-weight: 500;
+    color: white;
+}
+.main-profile-numbers {
+    font-size: 50px;
+    font-weight: 500;
+    color: white;
+}
+.numbers {
+    color: white;
 }

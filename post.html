@@ -146,9 +146,9 @@
     <!--End Alert Success Login-->
     <!--Nav Bar-->
     <div class="container">
-        <div class="d-flex justify-content-center pt-2">
-            <div class="col-9">
-                <nav class="navbar navbar-expand-lg bg-body-tertiary shadow rounded w-100">
+        <div class="d-flex justify-content-center justify-content-center pt-2 ">
+            <div class="col-sm-9 w-100 ">
+                <nav class="navbar navbar-dark bg-dark  navbar-expand-lg  shadow rounded  w-100 ">
                     <div class="container-fluid">
                         <a class="navbar-brand" href="home.html">PostsHub</a>
                         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -162,29 +162,25 @@
                                     <a class="nav-link active" aria-current="page" href="home.html">Home</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="#">Profile</a>
+                                    <a class="nav-link" href="profile.html">Profile</a>
                                 </li>
                             </ul>
                             <div class="d-flex gap-1" id="login-div">
                                 <button class="btn btn-outline-success" data-bs-toggle="modal"
-                                    data-bs-target="#login-modal" type="submit" id="login">
-                                    Login
-                                </button>
+                                    data-bs-target="#login-modal" type="submit" id="login">Login</button>
                                 <button class="btn btn-outline-success" data-bs-toggle="modal"
-                                    data-bs-target="#register-modal" type="submit" id="register">
-                                    Register
-                                </button>
+                                    data-bs-target="#register-modal" type="submit" id="register">Register</button>
                             </div>
 
                             <div class="d-flex gap-2 justify-content-center align-items-center" id="logout-div">
-                                <img src="images/user.jpg" id="user-profile-image" class="rounded-circle user-image"
-                                    alt="user-image" style="border-color: rgb(6, 204, 6)" />
-                                <button id="user-username" class="btn btn-outline-success">
-                                    mo
-                                </button>
-                                <button class="btn btn-danger" type="submit" onclick="Logout()" id="logout">
-                                    Logout
-                                </button>
+
+                                <a href="profile.html"><img src="images/user.jpg" id="user-profile-image"
+                                        class="rounded-circle user-image" alt="user-image"
+                                        style="border-color: rgb(6, 204, 6);"></a>
+                                <a href="profile.html"><button id="user-username"
+                                        class="btn btn-outline-success">mo</button></a>
+                                <button class="btn btn-danger" type="submit" onclick="Logout()"
+                                    id="logout">Logout</button>
                             </div>
                         </div>
                     </div>
@@ -192,6 +188,7 @@
             </div>
         </div>
     </div>
+    <!--End Nav Bar-->
     <!--user title-->
     <div class="container mt-5">
         <div class="d-flex justify-content-center">

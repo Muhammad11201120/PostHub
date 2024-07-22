@@ -6,26 +6,29 @@ function getPosts(reload = true, page = 1) {
 
             lastPage = response.data.meta.last_page;
             console.log(response.data);
-            let userImage = `images/userNone.jpg`;
-            let bodyImage = `images/nature.jpg`;
-            let title = "";
-            let body = "";
-            let userName = "";
-            let tags = [];
 
             for (let data of response.data.data) {
+                let userImage = `images/userNone.jpg`;
+                let bodyImage = `images/nature.jpg`;
+                let title = "";
+                let body = "";
+                let userName = "";
+                let tags = [];
                 // show or hide (Edit) Button
                 let user = getCurrentUser();
                 let isMyPost = user != null && data.author.id == user.id;
-                let buttonEditContent = ``;
+                let buttonDeleteEditContent = ``;
                 if (isMyPost) {
-                    buttonEditContent = `<button class="btn btn-secondary mt-2" onclick="editPostClicked('${encodeURIComponent(
-                        JSON.stringify(data)
-                    )}')"
-                        style="float: right; padding: 8px 20px;">EDIT</button>`;
+                    buttonDeleteEditContent = `
+                        <button class="btn btn-danger mt-2 mx-1" onclick="deletePostClicked('${encodeURIComponent(
+                            JSON.stringify(data)
+                        )}')"style="float: right; padding: 8px 15px;">DELETE</button>
+                        <button class="btn btn-primary mt-2" onclick="editPostClicked('${encodeURIComponent(
+                            JSON.stringify(data)
+                        )}')"style="float: right; padding: 8px 25px;">EDIT</button>`;
                 }
 
-                if (JSON.stringify(data.image) != "{}") bodyImage = data.image;
+                if (JSON.stringify(data.image) !== "{}") bodyImage = data.image;
                 if (data.title != null) title = data.title;
                 if (data.body != null) body = data.body;
                 if (data.tags.length != 0) {
@@ -33,7 +36,7 @@ function getPosts(reload = true, page = 1) {
                 }
                 if (data.author.username != null)
                     userName = data.author.username;
-                if (JSON.stringify(data.author.profile_image) != "{}")
+                if (JSON.stringify(data.author.profile_image) !== "{}")
                     userImage = data.author.profile_image;
                 FillPosts(
                     data,
@@ -43,9 +46,10 @@ function getPosts(reload = true, page = 1) {
                     body,
                     userName,
                     tags,
-                    buttonEditContent
+                    buttonDeleteEditContent
                 );
             }
+
             SetUpUI();
         })
         .catch((error) => {
@@ -63,13 +67,13 @@ function FillPosts(
     body,
     username,
     tags,
-    buttonEditContent
+    buttonDeleteEditContent
 ) {
-    let content = ` <div id="post" class="card col-9 shadow" ">
+    let content = ` <div id="post" class="card shadow text-white bg-secondary ">
                 <div class="card-header">
                     <img src="${userImage}" alt="user-image" id="user-image" class="rounded-circle m-2 user-image">
                     <p class="d-inline"><b>${username}</b></p>
-                    ${buttonEditContent}
+                    ${buttonDeleteEditContent}
                 </div>
                 <div class="card-body d-flex justify-content-center flex-column" style="cursor:pointer" onclick="getPostClicked(${data.id})">
                     <img src="${bodyImage}" alt="" id="body-image" class="w-100">
@@ -103,7 +107,7 @@ function FillPosts(
     }
     document.getElementById("posts").innerHTML += content;
 }
-getPosts(1);
+getPosts();
 function CreateNewPostBtnClicked() {
     let url = ``;
     const postID = document.getElementById("post-id-input").value;
@@ -176,9 +180,39 @@ function addNewPostBtnClicked() {
     postModal.toggle();
 }
 
-function getCurrentUser() {
-    let user = null;
-    const storedUser = localStorage.getItem("user");
-    if (storedUser != null) user = JSON.parse(storedUser);
-    return user;
+function deletePostClicked(data) {
+    let post = JSON.parse(decodeURIComponent(data));
+    document.getElementById("delete-post-id-input").value = post.id;
+    document.getElementById("deleted-post-title").innerHTML = post.title;
+    let postModal = new bootstrap.Modal(
+        document.getElementById("delete-post-modal"),
+        {}
+    );
+    postModal.toggle();
+}
+function ConfirmPostDeletion() {
+    let postId = document.getElementById("delete-post-id-input").value;
+    let headers = {
+        "Content-Type": "multipart/form-data",
+        authorization: `Bearer ${localStorage.getItem("token")}`,
+    };
+    axios
+        .delete(`${baseUrl}/posts/${postId}`, {
+            headers: headers,
+        })
+        .then((response) => {
+            // closing modal
+            const modal = document.getElementById("delete-post-modal");
+            const modalInstance = bootstrap.Modal.getInstance(modal);
+            modalInstance.hide();
+            ShowAlert(
+                "The Post Deleted Successfully",
+                "success",
+                "success-alert"
+            );
+            getPosts();
+        })
+        .catch((error) => {
+            ShowAlert(error.message, "danger", "danger-alert");
+        });
 }

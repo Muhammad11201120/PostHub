@@ -53,7 +53,7 @@ function RegisterBtnClicked() {
         "Content-Type": "multipart/form-data",
     };
     axios
-        .post(url + "/register", formData, {
+        .post(baseUrl + "/register", formData, {
             headers: headers,
         })
         .then((response) => {
@@ -82,11 +82,11 @@ function Logout() {
 }
 function ShowAlert(Custommessage, alertType, element) {
     const alertPlaceholder = document.getElementById(element);
-    const alert = (message, type) => {
+    const alert = (Custommessage, alertType) => {
         const wrapper = document.createElement("div");
         wrapper.innerHTML = [
-            `<div class="alert alert-${alertType} alert-dismissible" role="alert">`,
-            `   <div>${Custommessage}</div>`,
+            `<div class="alert alert-${Custommessage} alert-dismissible" role="alert">`,
+            `   <div>${alertType}</div>`,
             '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
             "</div>",
         ].join("");
@@ -97,7 +97,7 @@ function ShowAlert(Custommessage, alertType, element) {
     //Hiding alert
 
     setTimeout(function () {
-        const alertHide = bootstrap.Alert.getOrCreateInstance("#" + element);
+        const alertHide = bootstrap.Alert.getOrCreateInstance(`#${element}`);
         alertHide.close();
     }, 3000);
 }
@@ -133,4 +133,10 @@ function loadUserImage() {
         userImage.style.display = "flex";
         console.log(user_image);
     }
+}
+function getCurrentUser() {
+    let user = null;
+    const storedUser = localStorage.getItem("user");
+    if (storedUser != null) user = JSON.parse(storedUser);
+    return user;
 }
